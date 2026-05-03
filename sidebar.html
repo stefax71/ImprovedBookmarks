@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Improved Bookmarks</title>
+    <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+<div id="app">
+    <div id="toolbar">
+        <button id="btn-back" style="display:none">← Back</button>
+        <span id="toolbar-title" style="display: block">My Collections</span>
+        <button id="btn-new-collection">+ New Collection</button>
+    </div>
+    <div id="collections-list">
+
+    </div>
+
+    <div id="collection-view" style="display:none">
+        <div id="items-list"></div>
+        <button id="btn-add-item">+ Add current page</button>
+    </div>
+
+    <div id="add-item-modal" style="display:none">
+        <div id="modal-content">
+            <h3 id="modal-title"></h3>
+            <img id="modal-screenshot" src="" alt="screenshot"/>
+            <input type="text" id="input-title" placeholder="Title"/>
+            <textarea id="input-note" placeholder="Note (optional)"></textarea>
+            <div id="modal-buttons">
+                <button id="btn-cancel">Cancel</button>
+                <button id="btn-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="module" src="sidebar.js"></script>
+</body>
+</html>

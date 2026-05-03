@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Improved Bookmarks",
+  "version": "1.0",
+  "description": "This extension aims at replicating the functionalities of Microsoft Collections, that are going to be dismissed starting from Edge 145",
+  "permissions": [
+    "sidePanel",
+    "tabs",
+    "activeTab",
+    "storage",
+    "windows",
+    "scripting"
+  ],
+  "side_panel": {
+    "default_path": "sidebar.html"
+  },
+  "action": {
+    "default_title": "Open Bookmarks"
+  },
+  "commands": {
+    "open-sidebar": {
+      "suggested_key": {
+        "default": "Alt+Shift+Y"
+      },
+      "description": "Open the bookmarks"
+    }
+  },
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background-service-worker.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
