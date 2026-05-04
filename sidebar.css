@@ -89,6 +89,32 @@ body {
     cursor: pointer;
 }
 
+.item-handle {
+    color: GrayText;
+    opacity: 0.4;
+    cursor: grab;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding-right: 2px;
+}
+
+.item-handle:active {
+    cursor: grabbing;
+}
+
+.item.dragging {
+    opacity: 0.35;
+}
+
+.item.drag-over-top {
+    border-top: 2px solid Highlight;
+}
+
+.item.drag-over-bottom {
+    border-bottom: 2px solid Highlight !important;
+}
+
 .item:last-child {
     border-bottom: none;
 }

@@ -7,6 +7,9 @@ let currentItems = [];
 /** @type {string|null} */
 let currentCollectionId = null;
 
+/** @type {string|null} */
+let draggedId = null;
+
 /**
  * @param {Item[]} items
  * @param {string} collectionId
@@ -45,6 +48,61 @@ function applyFilter(query) {
 function createItemElement(item) {
     const el = document.createElement('div');
     el.className = 'item';
+    el.draggable = true;
+    el.dataset.id = item.id;
+
+    const handle = document.createElement('div');
+    handle.className = 'item-handle';
+    handle.innerHTML = `<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="3" cy="2" r="1.5"/><circle cx="7" cy="2" r="1.5"/><circle cx="3" cy="7" r="1.5"/><circle cx="7" cy="7" r="1.5"/><circle cx="3" cy="12" r="1.5"/><circle cx="7" cy="12" r="1.5"/></svg>`;
+    el.appendChild(handle);
+
+    el.addEventListener('dragstart', (e) => {
+        draggedId = item.id;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => el.classList.add('dragging'), 0);
+    });
+
+    el.addEventListener('dragend', () => {
+        draggedId = null;
+        el.classList.remove('dragging');
+        document.querySelectorAll('.item').forEach(i => i.classList.remove('drag-over-top', 'drag-over-bottom'));
+    });
+
+    el.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (draggedId === item.id) return;
+        const isTopHalf = e.clientY < el.getBoundingClientRect().top + el.offsetHeight / 2;
+        el.classList.toggle('drag-over-top', isTopHalf);
+        el.classList.toggle('drag-over-bottom', !isTopHalf);
+    });
+
+    el.addEventListener('dragleave', (e) => {
+        if (!el.contains(e.relatedTarget)) {
+            el.classList.remove('drag-over-top', 'drag-over-bottom');
+        }
+    });
+
+    el.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        el.classList.remove('drag-over-top', 'drag-over-bottom');
+        if (!draggedId || draggedId === item.id) return;
+
+        const insertBefore = e.clientY < el.getBoundingClientRect().top + el.offsetHeight / 2;
+        const fromIdx = currentItems.findIndex(i => i.id === draggedId);
+        const [moved] = currentItems.splice(fromIdx, 1);
+        const toIdx = currentItems.findIndex(i => i.id === item.id);
+        currentItems.splice(insertBefore ? toIdx : toIdx + 1, 0, moved);
+        currentItems.forEach((it, idx) => { it.order = idx; });
+
+        const collections = await getCollections();
+        const collection = collections.find(c => c.id === currentCollectionId);
+        if (collection) {
+            collection.items = [...currentItems];
+            await saveCollections(collections);
+        }
+
+        applyFilter(document.getElementById('input-filter').value);
+    });
 
     if (item.screenshot) {
         const img = document.createElement('img');
