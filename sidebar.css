@@ -17,6 +17,55 @@ body {
     gap: 8px;
     padding: 10px 12px;
     border-bottom: 1px solid ButtonBorder;
+    position: relative;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: CanvasText;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.btn-icon:hover {
+    background: ButtonFace;
+}
+
+#toolbar-menu {
+    position: absolute;
+    right: 8px;
+    top: calc(100% + 4px);
+    background: Canvas;
+    border: 1px solid ButtonBorder;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 140px;
+    overflow: hidden;
+}
+
+#toolbar-menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+    color: CanvasText;
+    font-family: inherit;
+}
+
+#toolbar-menu button:hover {
+    background: ButtonFace;
 }
 
 .btn-primary {
