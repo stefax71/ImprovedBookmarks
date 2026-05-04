@@ -5,6 +5,39 @@ import { getCollections, saveCollections } from './storage.js';
 export function renderItems(items) {
     const list = document.getElementById('items-list');
     list.innerHTML = '';
+
+    const sorted = [...items].sort((a, b) => a.order - b.order);
+    for (const item of sorted) {
+        const el = document.createElement('div');
+        el.className = 'item';
+
+        if (item.screenshot) {
+            const img = document.createElement('img');
+            img.className = 'item-screenshot';
+            img.src = item.screenshot;
+            img.alt = '';
+            el.appendChild(img);
+        }
+
+        const body = document.createElement('div');
+        body.className = 'item-body';
+
+        const title = document.createElement('span');
+        title.className = 'item-title';
+        title.textContent = item.title;
+        body.appendChild(title);
+
+        if (item.note) {
+            const note = document.createElement('span');
+            note.className = 'item-note';
+            note.textContent = item.note;
+            body.appendChild(note);
+        }
+
+        el.appendChild(body);
+        el.addEventListener('click', () => chrome.tabs.create({ url: item.url }));
+        list.appendChild(el);
+    }
 }
 
 /** @param {string} collectionId */

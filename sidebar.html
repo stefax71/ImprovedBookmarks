@@ -8,9 +8,9 @@
 <body>
 <div id="app">
     <div id="toolbar">
-        <button id="btn-back" style="display:none">← Back</button>
+        <button id="btn-back" class="btn-primary" style="display:none">← Back</button>
         <span id="toolbar-title" style="display: block">My Collections</span>
-        <button id="btn-new-collection">+ New Collection</button>
+        <button id="btn-new-collection" class="btn-primary">+ New Collection</button>
     </div>
     <div id="collections-list">
 
@@ -18,7 +18,7 @@
 
     <div id="collection-view" style="display:none">
         <div id="items-list"></div>
-        <button id="btn-add-item">+ Add current page</button>
+        <button id="btn-add-item" class="btn-primary">+ Add current page</button>
     </div>
 
     <div id="add-item-modal" style="display:none">
@@ -28,8 +28,8 @@
             <input type="text" id="input-title" placeholder="Title"/>
             <textarea id="input-note" placeholder="Note (optional)"></textarea>
             <div id="modal-buttons">
-                <button id="btn-cancel">Cancel</button>
-                <button id="btn-save">Save</button>
+                <button id="btn-cancel" class="btn-secondary">Cancel</button>
+                <button id="btn-save" class="btn-primary">Save</button>
             </div>
         </div>
     </div>

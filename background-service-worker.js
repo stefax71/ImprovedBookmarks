@@ -9,6 +9,7 @@ async function captureTab(tab) {
     });
     if (dataUrl) return dataUrl;
 
+    // This is necessary because captureVisibleTab (apparently) works only on Chrome, not on Edge
     console.log('[capture] captureVisibleTab failed, trying html2canvas');
     try {
         await chrome.scripting.executeScript({

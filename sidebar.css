@@ -19,7 +19,7 @@ body {
     border-bottom: 1px solid ButtonBorder;
 }
 
-#btn-new-collection, #btn-back, #btn-add-item {
+.btn-primary {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -32,13 +32,79 @@ body {
     cursor: pointer;
 }
 
-#btn-new-collection:hover {
+.btn-primary:hover {
+    opacity: 0.85;
+}
+
+.btn-secondary {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: ButtonFace;
+    color: ButtonText;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
     opacity: 0.85;
 }
 
 #collection-view {
     display: flex;
+    flex-direction: column;
     padding: 6px 12px;
+    gap: 8px;
+}
+
+#items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border: 1px solid ButtonBorder;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.item:hover {
+    background-color: ButtonFace;
+}
+
+.item-screenshot {
+    width: 72px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.item-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.item-title {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-note {
+    font-size: 12px;
+    color: GrayText;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #toolbar-title {
