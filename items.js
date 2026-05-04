@@ -109,16 +109,35 @@ function createActionButton(label, iconSvg, onClick, extraClass) {
 /** @param {Item} item */
 function editItem(item) {
     const modal = document.getElementById('add-item-modal');
+    const recaptureBtn = document.getElementById('btn-recapture');
     document.getElementById('modal-title').textContent = new URL(item.url).hostname;
     document.getElementById('input-title').value = item.title;
     document.getElementById('input-note').value = item.note ?? '';
     document.getElementById('modal-screenshot').src = item.screenshot ?? '';
+    recaptureBtn.style.display = item.screenshot ? 'flex' : 'none';
     modal.style.display = 'block';
+
+    recaptureBtn.onclick = () => recaptureScreenshot(item);
 
     document.getElementById('btn-save').onclick = () => updateItem(item);
     document.getElementById('btn-cancel').onclick = () => {
         modal.style.display = 'none';
     };
+}
+
+/** @param {Item} item */
+function recaptureScreenshot(item) {
+    const btn = document.getElementById('btn-recapture');
+    btn.disabled = true;
+    chrome.runtime.sendMessage({ action: 'captureNow' }, (response) => {
+        btn.disabled = false;
+        if (response?.dataUrl) {
+            item.screenshot = response.dataUrl;
+            document.getElementById('modal-screenshot').src = response.dataUrl;
+        } else {
+            console.error('Recapture failed:', response?.error);
+        }
+    });
 }
 
 /**
@@ -137,6 +156,7 @@ async function updateItem(item) {
 
     existing.title = title;
     existing.note = note;
+    existing.screenshot = item.screenshot;
     await saveCollections(collections);
 
     document.getElementById('add-item-modal').style.display = 'none';
@@ -144,8 +164,17 @@ async function updateItem(item) {
 }
 
 /** @param {Item} item */
-function deleteItem(item) {
-    // TODO
+async function deleteItem(item) {
+    if (!confirm(`Delete "${item.title}"?`)) return;
+
+    const collections = await getCollections();
+    const collection = collections.find(c => c.id === currentCollectionId);
+    if (!collection) return;
+
+    collection.items = collection.items.filter(i => i.id !== item.id);
+    await saveCollections(collections);
+
+    renderItems(collection.items, currentCollectionId);
 }
 
 /** @param {string} collectionId */
@@ -159,6 +188,7 @@ export function addItemToCollection(collectionId) {
         document.getElementById('modal-title').textContent = tab.title;
         document.getElementById('input-title').value = tab.title;
         document.getElementById('modal-screenshot').src = '';
+        document.getElementById('btn-recapture').style.display = 'none';
         document.getElementById('add-item-modal').style.display = 'block';
 
         document.getElementById('btn-save').onclick = () => saveItem(collectionId, tab.url, screenshotDataUrl);

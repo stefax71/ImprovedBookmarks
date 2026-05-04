@@ -230,11 +230,35 @@ body {
     gap: 10px;
 }
 
+#modal-screenshot-wrap {
+    position: relative;
+}
+
 #modal-screenshot {
     width: 100%;
     height: auto;
     border-radius: 4px;
     display: block;
+}
+
+#btn-recapture {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+#btn-recapture:hover {
+    background: rgba(0, 0, 0, 0.75);
 }
 
 #input-title, #input-note {

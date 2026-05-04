@@ -63,4 +63,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
         return true;
     }
+    if (message.action === 'captureNow') {
+        chrome.tabs.query({ active: true, currentWindow: true }, async ([tab]) => {
+            if (!tab) { sendResponse({ error: 'No active tab' }); return; }
+            const dataUrl = await captureTab(tab);
+            if (dataUrl) {
+                chrome.storage.session.set({ latest_screenshot: dataUrl });
+                sendResponse({ dataUrl });
+            } else {
+                sendResponse({ error: 'Capture failed' });
+            }
+        });
+        return true;
+    }
 });
