@@ -18,7 +18,7 @@ export async function openCollection(id) {
     document.getElementById('collections-list').style.display = 'none';
     document.getElementById('collection-view').style.display = 'block';
 
-    renderItems(collection.items);
+    renderItems(collection.items, collection.id);
 }
 
 export async function goBack() {

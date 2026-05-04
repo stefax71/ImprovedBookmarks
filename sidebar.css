@@ -53,8 +53,25 @@ body {
 #collection-view {
     display: flex;
     flex-direction: column;
-    padding: 6px 12px;
+}
+
+#collection-toolbar {
+    display: flex;
+    align-items: center;
     gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid ButtonBorder;
+}
+
+#input-filter {
+    flex: 1;
+    padding: 5px 8px;
+    border: 1px solid ButtonBorder;
+    border-radius: 4px;
+    background: Canvas;
+    color: CanvasText;
+    font-family: inherit;
+    font-size: 13px;
 }
 
 #items-list {
@@ -68,9 +85,12 @@ body {
     align-items: center;
     gap: 10px;
     padding: 8px;
-    border: 1px solid ButtonBorder;
-    border-radius: 4px;
+    border-bottom: 1px solid ButtonBorder;
     cursor: pointer;
+}
+
+.item:last-child {
+    border-bottom: none;
 }
 
 .item:hover {
@@ -83,6 +103,7 @@ body {
     object-fit: cover;
     border-radius: 2px;
     flex-shrink: 0;
+    cursor: pointer;
 }
 
 .item-body {
@@ -90,6 +111,7 @@ body {
     flex-direction: column;
     gap: 4px;
     overflow: hidden;
+    flex: 1;
 }
 
 .item-title {
@@ -97,6 +119,11 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.item-title:hover {
+    text-decoration: underline;
 }
 
 .item-note {
@@ -105,6 +132,63 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.item-host {
+    font-size: 11px;
+    color: GrayText;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.btn-item-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid ButtonBorder;
+    border-radius: 3px;
+    background: transparent;
+    color: CanvasText;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.btn-item-edit {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    color: white;
+}
+
+.btn-item-edit:hover {
+    background-color: #2471a3;
+    border-color: #2471a3;
+}
+
+.btn-item-delete {
+    background-color: #c0392b;
+    border-color: #c0392b;
+    color: white;
+}
+
+.btn-item-delete:hover {
+    background-color: #a93226;
+    border-color: #a93226;
 }
 
 #toolbar-title {
