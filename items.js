@@ -254,19 +254,16 @@ export function addItemToCollection(collectionId) {
             document.getElementById('add-item-modal').style.display = 'none';
         };
 
-        captureScreenshot(tab.id, (dataUrl) => {
+        captureScreenshot((dataUrl) => {
             screenshotDataUrl = dataUrl;
             document.getElementById('modal-screenshot').src = dataUrl;
         });
     });
 }
 
-/**
- * @param {number} tabId
- * @param {(dataUrl: string) => void} callback
- */
-function captureScreenshot(tabId, callback) {
-    chrome.runtime.sendMessage({ action: 'captureScreenshot', tabId }, (response) => {
+/** @param {(dataUrl: string) => void} callback */
+function captureScreenshot(callback) {
+    chrome.runtime.sendMessage({ action: 'captureNow' }, (response) => {
         if (response?.dataUrl) {
             callback(response.dataUrl);
         } else {
