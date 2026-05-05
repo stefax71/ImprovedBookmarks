@@ -7,7 +7,7 @@
 body {
     font-family: "Segoe UI", sans-serif;
     font-size: 14px;
-    background-color: Canvas;
+    background-color: ButtonFace;
     color: CanvasText;
 }
 
@@ -16,7 +16,8 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    border-bottom: 1px solid ButtonFace;
+    background: Canvas;
+    border-bottom: 1px solid ButtonShadow;
     position: relative;
 }
 
@@ -109,7 +110,8 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border-bottom: 1px solid ButtonFace;
+    background: Canvas;
+    border-bottom: 1px solid ButtonShadow;
 }
 
 #input-filter {
@@ -126,16 +128,24 @@ body {
 #items-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    padding: 8px;
 }
 
 .item {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 12px;
+    background: Canvas;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.item-top {
+    display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px;
-    border-bottom: 1px solid GrayText;
-    cursor: pointer;
 }
 
 .item-handle {
@@ -153,7 +163,8 @@ body {
 }
 
 .item.dragging {
-    opacity: 0.35;
+    opacity: 0.6;
+    outline: 2px dashed Highlight;
 }
 
 .item.drag-over-top {
@@ -161,22 +172,14 @@ body {
 }
 
 .item.drag-over-bottom {
-    border-bottom: 2px solid Highlight !important;
-}
-
-.item:last-child {
-    border-bottom: none;
-}
-
-.item:hover {
-    background-color: ButtonFace;
+    border-bottom: 2px solid Highlight;
 }
 
 .item-screenshot {
-    width: 72px;
-    height: 48px;
+    width: 100px;
+    height: 68px;
     object-fit: cover;
-    border-radius: 2px;
+    border-radius: 4px;
     flex-shrink: 0;
     cursor: pointer;
 }
@@ -209,14 +212,6 @@ body {
     text-overflow: ellipsis;
 }
 
-.item-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 2px;
-}
-
 .item-host {
     font-size: 11px;
     color: GrayText;
@@ -227,43 +222,33 @@ body {
 
 .item-actions {
     display: flex;
-    gap: 4px;
-    flex-shrink: 0;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid ButtonFace;
+    padding-top: 8px;
 }
 
 .btn-item-action {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border: 1px solid ButtonBorder;
-    border-radius: 3px;
-    background: transparent;
-    color: CanvasText;
-    font-size: 11px;
+    gap: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: Highlight;
+    color: HighlightText;
+    font-size: 13px;
     cursor: pointer;
+    font-family: inherit;
 }
 
-.btn-item-edit {
-    background-color: #2980b9;
-    border-color: #2980b9;
-    color: white;
-}
-
-.btn-item-edit:hover {
-    background-color: #2471a3;
-    border-color: #2471a3;
+.btn-item-action:hover {
+    opacity: 0.85;
 }
 
 .btn-item-delete {
     background-color: #c0392b;
-    border-color: #c0392b;
     color: white;
-}
-
-.btn-item-delete:hover {
-    background-color: #a93226;
-    border-color: #a93226;
 }
 
 #toolbar-title {
