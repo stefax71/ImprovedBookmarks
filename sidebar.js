@@ -4,9 +4,9 @@ import { openCollection, goBack, currentCollectionId } from './navigation.js';
 import { addItemToCollection } from './items.js';
 
 document.getElementById('btn-new-collection').addEventListener('click', async () => {
-    const nome = prompt('Collection Name:');
-    if (!nome || nome.trim() === '') return;
-    const collections = await newCollection(nome.trim());
+    const name = prompt('Collection Name:');
+    if (!name || name.trim() === '') return;
+    const collections = await newCollection(name.trim());
     renderCollections(collections, openCollection);
 });
 
