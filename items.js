@@ -254,11 +254,28 @@ export function addItemToCollection(collectionId) {
             document.getElementById('add-item-modal').style.display = 'none';
         };
 
-        captureScreenshot((dataUrl) => {
-            screenshotDataUrl = dataUrl;
-            document.getElementById('modal-screenshot').src = dataUrl;
-        });
+        const youtubeThumbnail = getYoutubeThumbnail(tab.url);
+        if (youtubeThumbnail) {
+            screenshotDataUrl = youtubeThumbnail;
+            document.getElementById('modal-screenshot').src = youtubeThumbnail;
+        } else {
+            captureScreenshot((dataUrl) => {
+                screenshotDataUrl = dataUrl;
+                document.getElementById('modal-screenshot').src = dataUrl;
+            });
+        }
     });
+}
+
+/**
+ * @param {string} url
+ * @returns {string|null}
+ */
+function getYoutubeThumbnail(url) {
+    const { hostname, href } = new URL(url);
+    if (!hostname.includes('youtube')) return null;
+    const match = href.match(/[?&]v=([^&]+)/);
+    return match ? `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg` : null;
 }
 
 /** @param {(dataUrl: string) => void} callback */

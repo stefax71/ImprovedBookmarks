@@ -9,6 +9,11 @@ async function captureTab(tab) {
     });
     if (dataUrl) return dataUrl;
 
+    // Skip html2canvas on sites that block script injection (e.g. YouTube)
+    try {
+        if (new URL(tab.url).hostname.includes('youtube')) return null;
+    } catch { return null; }
+
     // This is necessary because captureVisibleTab (apparently) works only on Chrome, not on Edge
     console.log('[capture] captureVisibleTab failed, trying html2canvas');
     try {
