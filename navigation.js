@@ -24,6 +24,7 @@ export async function openCollection(id) {
 export async function goBack() {
     currentCollectionId = null;
 
+    document.getElementById('add-item-modal').style.display = 'none';
     document.getElementById('toolbar-title').textContent = 'My Collections';
     document.getElementById('btn-back').style.display = 'none';
     document.getElementById('btn-new-collection').style.display = 'block';

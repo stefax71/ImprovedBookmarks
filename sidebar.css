@@ -9,6 +9,14 @@ body {
     font-size: 14px;
     background-color: ButtonFace;
     color: CanvasText;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 #toolbar {
@@ -103,6 +111,8 @@ body {
 #collection-view {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 #collection-toolbar {
@@ -130,6 +140,8 @@ body {
     flex-direction: column;
     gap: 8px;
     padding: 8px;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .item {
@@ -262,17 +274,18 @@ body {
     flex-direction: column;
     gap: 8px;
     padding: 8px;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .collection {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
     padding: 10px 12px;
     background: Canvas;
     border-radius: 8px;
     cursor: pointer;
-    position: relative;
 }
 
 .collection.dragging {
@@ -286,6 +299,12 @@ body {
 
 .collection.drag-over-bottom {
     border-bottom: 2px solid Highlight;
+}
+
+.collection-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .collection-handle {
@@ -307,11 +326,31 @@ body {
     flex-shrink: 0;
 }
 
-.collection-name {
+.collection-thumbnail {
+    width: 56px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.collection-name-wrap {
     flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.collection-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.collection-count {
+    font-size: 11px;
+    color: GrayText;
 }
 
 .collection-rename-input {
@@ -326,51 +365,35 @@ body {
     outline: none;
 }
 
-.btn-collection-menu {
-    opacity: 0;
-    flex-shrink: 0;
-    font-size: 16px;
-}
-
-.collection:hover .btn-collection-menu,
-.collection.menu-open .btn-collection-menu {
-    opacity: 1;
-}
-
-.collection-menu {
-    position: absolute;
-    right: 8px;
-    top: calc(100% - 2px);
-    background: Canvas;
-    border: 1px solid ButtonFace;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
-    min-width: 140px;
-    overflow: hidden;
-}
-
-.collection-menu button {
+.collection-actions {
     display: flex;
-    align-items: center;
+    justify-content: flex-end;
     gap: 8px;
-    width: 100%;
-    padding: 8px 14px;
-    background: none;
+    border-top: 1px solid ButtonFace;
+    padding-top: 8px;
+}
+
+.btn-collection-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
     border: none;
-    cursor: pointer;
-    text-align: left;
+    border-radius: 4px;
+    background-color: Highlight;
+    color: HighlightText;
     font-size: 13px;
-    color: CanvasText;
+    cursor: pointer;
     font-family: inherit;
 }
 
-.collection-menu button:hover {
-    background: ButtonFace;
+.btn-collection-action:hover {
+    opacity: 0.85;
 }
 
-.collection-menu .collection-menu-delete {
-    color: #c0392b;
+.btn-collection-delete {
+    background-color: #c0392b;
+    color: white;
 }
 
 #add-item-modal {
