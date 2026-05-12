@@ -1,5 +1,5 @@
 /** @import { Collection } from './types.js' */
-import { getCollections, saveCollections } from './storage.js';
+import { getCollections, saveCollections, findCollectionById } from './storage.js';
 
 /** @type {((id: string) => void) | null} */
 let onCollectionClickRef = null;
@@ -10,21 +10,37 @@ let draggedId = null;
 /** @type {Collection[]} */
 let currentCollections = [];
 
+/** @type {HTMLElement|null} */
+let currentContainerRef = null;
 
 /**
  * @param {string} name
+ * @param {string|null} parentId
  * @returns {Promise<Collection[]>}
  */
-export async function newCollection(name) {
+export async function newCollection(name, parentId = null) {
     const collections = await getCollections();
     /** @type {Collection} */
     const collection = {
         id: crypto.randomUUID(),
         name,
-        order: collections.length,
-        items: []
+        order: 0,
+        items: [],
+        subcollections: []
     };
-    collections.push(collection);
+
+    if (parentId) {
+        const parent = findCollectionById(collections, parentId);
+        if (parent) {
+            parent.subcollections = parent.subcollections ?? [];
+            collection.order = parent.subcollections.length;
+            parent.subcollections.push(collection);
+        }
+    } else {
+        collection.order = collections.length;
+        collections.push(collection);
+    }
+
     await saveCollections(collections);
     return collections;
 }
@@ -32,14 +48,15 @@ export async function newCollection(name) {
 /**
  * @param {Collection[]} collections
  * @param {(id: string) => void} onCollectionClick
+ * @param {HTMLElement} [container]
  */
-export function renderCollections(collections, onCollectionClick) {
+export function renderCollections(collections, onCollectionClick, container = document.getElementById('collections-list')) {
     onCollectionClickRef = onCollectionClick;
+    currentContainerRef = container;
     currentCollections = [...collections].sort((a, b) => a.order - b.order);
-    const lista = document.getElementById('collections-list');
-    lista.innerHTML = '';
+    container.innerHTML = '';
     currentCollections.forEach(collection => {
-        lista.appendChild(createCollectionElement(collection, onCollectionClick));
+        container.appendChild(createCollectionElement(collection, onCollectionClick));
     });
 }
 
@@ -90,12 +107,12 @@ function createCollectionElement(collection, onCollectionClick) {
 
         const all = await getCollections();
         currentCollections.forEach(c => {
-            const existing = all.find(a => a.id === c.id);
+            const existing = findCollectionById(all, c.id);
             if (existing) existing.order = c.order;
         });
         await saveCollections(all);
 
-        renderCollections(currentCollections, onCollectionClickRef);
+        renderCollections(currentCollections, onCollectionClickRef, currentContainerRef);
     });
 
     const left = document.createElement('div');
@@ -136,7 +153,9 @@ function createCollectionElement(collection, onCollectionClick) {
     const countSpan = document.createElement('span');
     countSpan.className = 'collection-count';
     const n = collection.items.length;
-    countSpan.textContent = n === 1 ? '1 page' : `${n} pages`;
+    const sub = (collection.subcollections ?? []).length;
+    const pagePart = n === 1 ? '1 page' : `${n} pages`;
+    countSpan.textContent = sub > 0 ? `${pagePart} · ${sub} sub-collection${sub > 1 ? 's' : ''}` : pagePart;
     nameWrap.appendChild(countSpan);
 
     right.appendChild(nameWrap);
@@ -185,11 +204,13 @@ function startRename(nameSpan, collection) {
         const newName = input.value.trim();
         if (newName && newName !== collection.name) {
             const collections = await getCollections();
-            const c = collections.find(col => col.id === collection.id);
+            const c = findCollectionById(collections, collection.id);
             if (c) {
                 c.name = newName;
                 await saveCollections(collections);
-                renderCollections(collections, onCollectionClickRef);
+                const local = currentCollections.find(col => col.id === collection.id);
+                if (local) local.name = newName;
+                renderCollections(currentCollections, onCollectionClickRef, currentContainerRef);
             }
         } else {
             input.replaceWith(nameSpan);
@@ -210,8 +231,27 @@ function startRename(nameSpan, collection) {
 async function deleteCollection(id) {
     if (!confirm('Delete this collection and all its items?')) return;
     const collections = await getCollections();
-    const updated = collections.filter(c => c.id !== id);
-    updated.forEach((c, i) => { c.order = i; });
-    await saveCollections(updated);
-    renderCollections(updated, onCollectionClickRef);
+    removeCollectionById(collections, id);
+    await saveCollections(collections);
+    currentCollections = currentCollections.filter(c => c.id !== id);
+    currentCollections.forEach((c, i) => { c.order = i; });
+    renderCollections(currentCollections, onCollectionClickRef, currentContainerRef);
+}
+
+/**
+ * @param {Collection[]} collections
+ * @param {string} id
+ * @returns {boolean}
+ */
+function removeCollectionById(collections, id) {
+    const idx = collections.findIndex(c => c.id === id);
+    if (idx !== -1) {
+        collections.splice(idx, 1);
+        collections.forEach((c, i) => { c.order = i; });
+        return true;
+    }
+    for (const c of collections) {
+        if (c.subcollections && removeCollectionById(c.subcollections, id)) return true;
+    }
+    return false;
 }

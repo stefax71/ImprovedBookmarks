@@ -135,13 +135,68 @@ body {
     font-size: 13px;
 }
 
+#collection-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#subcollections-section {
+    padding: 8px 8px 4px;
+    border-bottom: 1px solid ButtonShadow;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: GrayText;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: Highlight;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: inherit;
+}
+
+.btn-link:hover {
+    opacity: 0.75;
+}
+
+#subcollections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#subcollections-list:empty {
+    display: none;
+}
+
+#subcollections-section:has(#subcollections-list:empty) {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
 #items-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 8px;
-    flex: 1;
-    overflow-y: auto;
 }
 
 .item {

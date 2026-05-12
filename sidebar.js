@@ -1,6 +1,6 @@
 import { getCollections, saveCollections } from './storage.js';
 import { newCollection, renderCollections } from './collections.js';
-import { openCollection, goBack, currentCollectionId } from './navigation.js';
+import { openCollection, goBack, refreshCurrentCollection, currentCollectionId } from './navigation.js';
 import { addItemToCollection } from './items.js';
 
 document.getElementById('btn-new-collection').addEventListener('click', async () => {
@@ -11,6 +11,13 @@ document.getElementById('btn-new-collection').addEventListener('click', async ()
 });
 
 document.getElementById('btn-back').addEventListener('click', goBack);
+
+document.getElementById('btn-new-subcollection').addEventListener('click', async () => {
+    const name = prompt('Sub-collection name:');
+    if (!name || name.trim() === '') return;
+    await newCollection(name.trim(), currentCollectionId);
+    await refreshCurrentCollection();
+});
 
 document.getElementById('btn-add-item').addEventListener('click', () => addItemToCollection(currentCollectionId));
 

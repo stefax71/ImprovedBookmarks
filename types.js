@@ -15,4 +15,5 @@
  * @property {string} name
  * @property {number} order
  * @property {Item[]} items
+ * @property {Collection[]} subcollections
  */

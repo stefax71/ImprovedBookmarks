@@ -13,3 +13,19 @@ export function saveCollections(collections) {
         chrome.storage.local.set({ collections }, resolve);
     });
 }
+
+/**
+ * @param {Collection[]} collections
+ * @param {string} id
+ * @returns {Collection|null}
+ */
+export function findCollectionById(collections, id) {
+    for (const c of collections) {
+        if (c.id === id) return c;
+        if (c.subcollections?.length) {
+            const found = findCollectionById(c.subcollections, id);
+            if (found) return found;
+        }
+    }
+    return null;
+}

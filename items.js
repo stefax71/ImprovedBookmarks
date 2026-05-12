@@ -1,5 +1,5 @@
 /** @import { Item } from './types.js' */
-import { getCollections, saveCollections } from './storage.js';
+import { getCollections, saveCollections, findCollectionById } from './storage.js';
 
 /** @type {Item[]} */
 let currentItems = [];
@@ -94,7 +94,7 @@ function createItemElement(item) {
         currentItems.forEach((it, idx) => { it.order = idx; });
 
         const collections = await getCollections();
-        const collection = collections.find(c => c.id === currentCollectionId);
+        const collection = findCollectionById(collections, currentCollectionId);
         if (collection) {
             collection.items = [...currentItems];
             await saveCollections(collections);
@@ -211,7 +211,7 @@ async function updateItem(item) {
     const note = document.getElementById('input-note').value.trim();
 
     const collections = await getCollections();
-    const collection = collections.find(c => c.id === currentCollectionId);
+    const collection = findCollectionById(collections, currentCollectionId);
     if (!collection) return;
 
     const existing = collection.items.find(i => i.id === item.id);
@@ -231,7 +231,7 @@ async function deleteItem(item) {
     if (!confirm(`Delete "${item.title}"?`)) return;
 
     const collections = await getCollections();
-    const collection = collections.find(c => c.id === currentCollectionId);
+    const collection = findCollectionById(collections, currentCollectionId);
     if (!collection) return;
 
     collection.items = collection.items.filter(i => i.id !== item.id);
@@ -304,7 +304,7 @@ async function saveItem(collectionId, url, dataUrl) {
     const note = document.getElementById('input-note').value.trim();
 
     const collections = await getCollections();
-    const collection = collections.find(c => c.id === collectionId);
+    const collection = findCollectionById(collections, collectionId);
     if (!collection) return;
 
     /** @type {Item} */
