@@ -2,7 +2,7 @@ import { getCollections, findCollectionById } from './storage.js';
 import { renderCollections } from './collections.js';
 import { renderItems } from './items.js';
 
-/** @type {string[]} */
+/** @type {{id: string, name: string}[]} */
 let stack = [];
 
 /** @type {string|null} */
@@ -10,7 +10,7 @@ export let currentCollectionId = null;
 
 /** @param {string} id */
 export async function openCollection(id) {
-    stack.push(id);
+    stack.push({ id, name: '' });
     currentCollectionId = id;
     await renderCurrentCollection();
 }
@@ -20,14 +20,15 @@ export async function refreshCurrentCollection() {
 }
 
 async function renderCurrentCollection() {
-    const id = stack[stack.length - 1];
+    const entry = stack[stack.length - 1];
     const collections = await getCollections();
-    const collection = findCollectionById(collections, id);
+    const collection = findCollectionById(collections, entry.id);
     if (!collection) return;
 
-    currentCollectionId = id;
+    entry.name = collection.name;
+    currentCollectionId = entry.id;
 
-    document.getElementById('toolbar-title').textContent = collection.name;
+    document.getElementById('toolbar-title').textContent = stack.map(s => s.name).join(' › ');
     document.getElementById('btn-back').style.display = 'block';
     document.getElementById('btn-new-collection').style.display = 'none';
     document.getElementById('collections-list').style.display = 'none';
@@ -36,12 +37,12 @@ async function renderCurrentCollection() {
     const subcollEl = document.getElementById('subcollections-list');
     renderCollections(collection.subcollections ?? [], openCollection, subcollEl);
 
-    renderItems(collection.items, id);
+    renderItems(collection.items, entry.id);
 }
 
 export async function goBack() {
     stack.pop();
-    currentCollectionId = stack.length > 0 ? stack[stack.length - 1] : null;
+    currentCollectionId = stack.length > 0 ? stack[stack.length - 1].id : null;
 
     document.getElementById('add-item-modal').style.display = 'none';
 
