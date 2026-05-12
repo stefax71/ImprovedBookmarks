@@ -98,13 +98,13 @@ function createCollectionElement(collection, onCollectionClick) {
         renderCollections(currentCollections, onCollectionClickRef);
     });
 
-    const top = document.createElement('div');
-    top.className = 'collection-top';
+    const left = document.createElement('div');
+    left.className = 'collection-left';
 
     const handle = document.createElement('div');
     handle.className = 'collection-handle';
     handle.innerHTML = `<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="3" cy="2" r="1.5"/><circle cx="7" cy="2" r="1.5"/><circle cx="3" cy="7" r="1.5"/><circle cx="7" cy="7" r="1.5"/><circle cx="3" cy="12" r="1.5"/><circle cx="7" cy="12" r="1.5"/></svg>`;
-    top.appendChild(handle);
+    left.appendChild(handle);
 
     const firstItem = [...collection.items].sort((a, b) => a.order - b.order).find(i => i.screenshot);
     if (firstItem) {
@@ -112,13 +112,18 @@ function createCollectionElement(collection, onCollectionClick) {
         thumb.className = 'collection-thumbnail';
         thumb.src = firstItem.screenshot;
         thumb.alt = '';
-        top.appendChild(thumb);
+        left.appendChild(thumb);
     } else {
         const icon = document.createElement('span');
         icon.className = 'collection-icon';
         icon.textContent = '📁';
-        top.appendChild(icon);
+        left.appendChild(icon);
     }
+
+    div.appendChild(left);
+
+    const right = document.createElement('div');
+    right.className = 'collection-right';
 
     const nameWrap = document.createElement('div');
     nameWrap.className = 'collection-name-wrap';
@@ -134,9 +139,7 @@ function createCollectionElement(collection, onCollectionClick) {
     countSpan.textContent = n === 1 ? '1 page' : `${n} pages`;
     nameWrap.appendChild(countSpan);
 
-    top.appendChild(nameWrap);
-
-    div.appendChild(top);
+    right.appendChild(nameWrap);
 
     const actions = document.createElement('div');
     actions.className = 'collection-actions';
@@ -159,7 +162,8 @@ function createCollectionElement(collection, onCollectionClick) {
     });
     actions.appendChild(deleteBtn);
 
-    div.appendChild(actions);
+    right.appendChild(actions);
+    div.appendChild(right);
 
     div.addEventListener('click', () => onCollectionClick(collection.id));
     return div;

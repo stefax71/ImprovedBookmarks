@@ -146,18 +146,30 @@ body {
 
 .item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
     padding: 10px 12px;
     background: Canvas;
     border-radius: 8px;
     cursor: pointer;
+    align-items: stretch;
 }
 
-.item-top {
+.item-left {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: row;
+    gap: 6px;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.item-right {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .item-handle {
@@ -166,8 +178,9 @@ body {
     cursor: grab;
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding-right: 2px;
+    padding-top: 2px;
 }
 
 .item-handle:active {
@@ -189,11 +202,13 @@ body {
 
 .item-screenshot {
     width: 100px;
-    height: 68px;
     object-fit: cover;
     border-radius: 4px;
     flex-shrink: 0;
     cursor: pointer;
+    align-self: stretch;
+    display: block;
+    min-height: 60px;
 }
 
 .item-body {
@@ -280,12 +295,13 @@ body {
 
 .collection {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
     padding: 10px 12px;
     background: Canvas;
     border-radius: 8px;
     cursor: pointer;
+    align-items: stretch;
 }
 
 .collection.dragging {
@@ -301,10 +317,21 @@ body {
     border-bottom: 2px solid Highlight;
 }
 
-.collection-top {
+.collection-left {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: row;
+    gap: 6px;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.collection-right {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .collection-handle {
@@ -313,8 +340,9 @@ body {
     cursor: grab;
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding-right: 2px;
+    padding-top: 2px;
 }
 
 .collection-handle:active {
@@ -324,14 +352,18 @@ body {
 .collection-icon {
     font-size: 16px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 .collection-thumbnail {
-    width: 56px;
-    height: 40px;
+    width: 80px;
     object-fit: cover;
     border-radius: 4px;
     flex-shrink: 0;
+    align-self: stretch;
+    display: block;
+    min-height: 44px;
 }
 
 .collection-name-wrap {
