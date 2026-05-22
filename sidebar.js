@@ -1,4 +1,5 @@
 import { getCollections, saveCollections } from './storage.js';
+import { migrateFromStorage } from './screenshot-store.js';
 import { newCollection, renderCollections } from './collections.js';
 import { openCollection, goBack, refreshCurrentCollection, currentCollectionId } from './navigation.js';
 import { addItemToCollection } from './items.js';
@@ -83,4 +84,7 @@ inputImport.addEventListener('change', async () => {
     await goBack();
 });
 
-getCollections().then(collections => renderCollections(collections, openCollection));
+getCollections().then(async collections => {
+    if (await migrateFromStorage(collections)) await saveCollections(collections);
+    renderCollections(collections, openCollection);
+});

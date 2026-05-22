@@ -4,7 +4,7 @@
  * @property {string} title
  * @property {string} url
  * @property {string} note
- * @property {string} screenshot
+ * @property {string} [screenshot]
  * @property {number} order
  * @property {string} addedAt
  */

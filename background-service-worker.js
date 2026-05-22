@@ -3,7 +3,7 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
 
 async function captureTab(tab) {
     const dataUrl = await new Promise(resolve => {
-        chrome.tabs.captureVisibleTab({ format: 'png' }, (dataUrl) => {
+        chrome.tabs.captureVisibleTab({ format: 'jpeg', quality: 80 }, (dataUrl) => {
             resolve(chrome.runtime.lastError ? null : dataUrl);
         });
     });

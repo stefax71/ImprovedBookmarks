@@ -1,5 +1,6 @@
 /** @import { Collection } from './types.js' */
 import { getCollections, saveCollections, findCollectionById } from './storage.js';
+import { getScreenshot } from './screenshot-store.js';
 
 /** @type {((id: string) => void) | null} */
 let onCollectionClickRef = null;
@@ -123,18 +124,21 @@ function createCollectionElement(collection, onCollectionClick) {
     handle.innerHTML = `<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="3" cy="2" r="1.5"/><circle cx="7" cy="2" r="1.5"/><circle cx="3" cy="7" r="1.5"/><circle cx="7" cy="7" r="1.5"/><circle cx="3" cy="12" r="1.5"/><circle cx="7" cy="12" r="1.5"/></svg>`;
     left.appendChild(handle);
 
-    const firstItem = [...collection.items].sort((a, b) => a.order - b.order).find(i => i.screenshot);
+    const icon = document.createElement('span');
+    icon.className = 'collection-icon';
+    icon.textContent = '📁';
+    left.appendChild(icon);
+
+    const firstItem = [...collection.items].sort((a, b) => a.order - b.order)[0];
     if (firstItem) {
-        const thumb = document.createElement('img');
-        thumb.className = 'collection-thumbnail';
-        thumb.src = firstItem.screenshot;
-        thumb.alt = '';
-        left.appendChild(thumb);
-    } else {
-        const icon = document.createElement('span');
-        icon.className = 'collection-icon';
-        icon.textContent = '📁';
-        left.appendChild(icon);
+        getScreenshot(firstItem.id).then(url => {
+            if (!url) return;
+            const thumb = document.createElement('img');
+            thumb.className = 'collection-thumbnail';
+            thumb.src = url;
+            thumb.alt = '';
+            icon.replaceWith(thumb);
+        });
     }
 
     div.appendChild(left);

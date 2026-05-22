@@ -37,7 +37,7 @@ async function renderCurrentCollection() {
     const subcollEl = document.getElementById('subcollections-list');
     renderCollections(collection.subcollections ?? [], openCollection, subcollEl);
 
-    renderItems(collection.items, entry.id);
+    await renderItems(collection.items, entry.id);
 }
 
 export async function goBack() {

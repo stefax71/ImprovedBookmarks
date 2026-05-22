@@ -1,5 +1,6 @@
 /** @import { Item } from './types.js' */
 import { getCollections, saveCollections, findCollectionById } from './storage.js';
+import { getScreenshot, saveScreenshot, deleteScreenshot } from './screenshot-store.js';
 
 /** @type {Item[]} */
 let currentItems = [];
@@ -10,13 +11,22 @@ let currentCollectionId = null;
 /** @type {string|null} */
 let draggedId = null;
 
+/** @type {Map<string, string>} itemId → screenshot URL */
+let screenshotCache = new Map();
+
 /**
  * @param {Item[]} items
  * @param {string} collectionId
  */
-export function renderItems(items, collectionId) {
+export async function renderItems(items, collectionId) {
     currentCollectionId = collectionId;
     currentItems = [...items].sort((a, b) => a.order - b.order);
+
+    screenshotCache = new Map();
+    await Promise.all(currentItems.map(async item => {
+        const url = await getScreenshot(item.id);
+        if (url) screenshotCache.set(item.id, url);
+    }));
 
     const filter = document.getElementById('input-filter');
     filter.value = '';
@@ -107,10 +117,11 @@ function createItemElement(item) {
     left.className = 'item-left';
     left.appendChild(handle);
 
-    if (item.screenshot) {
+    const screenshotUrl = screenshotCache.get(item.id);
+    if (screenshotUrl) {
         const img = document.createElement('img');
         img.className = 'item-screenshot';
-        img.src = item.screenshot;
+        img.src = screenshotUrl;
         img.alt = '';
         img.addEventListener('click', () => chrome.tabs.create({ url: item.url }));
         left.appendChild(img);
@@ -173,40 +184,43 @@ function createActionButton(label, iconSvg, onClick, extraClass) {
 function editItem(item) {
     const modal = document.getElementById('add-item-modal');
     const recaptureBtn = document.getElementById('btn-recapture');
+    let pendingScreenshot = screenshotCache.get(item.id) ?? null;
+    let screenshotChanged = false;
+
     document.getElementById('modal-title').textContent = new URL(item.url).hostname;
     document.getElementById('input-title').value = item.title;
     document.getElementById('input-note').value = item.note ?? '';
-    document.getElementById('modal-screenshot').src = item.screenshot ?? '';
-    recaptureBtn.style.display = item.screenshot ? 'flex' : 'none';
+    document.getElementById('modal-screenshot').src = pendingScreenshot ?? '';
+    recaptureBtn.style.display = pendingScreenshot ? 'flex' : 'none';
     modal.style.display = 'block';
 
-    recaptureBtn.onclick = () => recaptureScreenshot(item);
+    recaptureBtn.onclick = () => {
+        recaptureBtn.disabled = true;
+        chrome.runtime.sendMessage({ action: 'captureNow' }, async (response) => {
+            recaptureBtn.disabled = false;
+            if (response?.dataUrl) {
+                pendingScreenshot = await compressImage(response.dataUrl);
+                screenshotChanged = true;
+                document.getElementById('modal-screenshot').src = pendingScreenshot;
+                recaptureBtn.style.display = 'flex';
+            } else {
+                console.error('Recapture failed:', response?.error);
+            }
+        });
+    };
 
-    document.getElementById('btn-save').onclick = () => updateItem(item);
+    document.getElementById('btn-save').onclick = () =>
+        updateItem(item, screenshotChanged ? pendingScreenshot : undefined);
     document.getElementById('btn-cancel').onclick = () => {
         modal.style.display = 'none';
     };
 }
 
-/** @param {Item} item */
-function recaptureScreenshot(item) {
-    const btn = document.getElementById('btn-recapture');
-    btn.disabled = true;
-    chrome.runtime.sendMessage({ action: 'captureNow' }, (response) => {
-        btn.disabled = false;
-        if (response?.dataUrl) {
-            item.screenshot = response.dataUrl;
-            document.getElementById('modal-screenshot').src = response.dataUrl;
-        } else {
-            console.error('Recapture failed:', response?.error);
-        }
-    });
-}
-
 /**
  * @param {Item} item
+ * @param {string|null|undefined} pendingScreenshot - undefined means unchanged
  */
-async function updateItem(item) {
+async function updateItem(item, pendingScreenshot) {
     const title = document.getElementById('input-title').value.trim();
     const note = document.getElementById('input-note').value.trim();
 
@@ -219,11 +233,15 @@ async function updateItem(item) {
 
     existing.title = title;
     existing.note = note;
-    existing.screenshot = item.screenshot;
     await saveCollections(collections);
 
+    if (pendingScreenshot !== undefined && pendingScreenshot) {
+        await saveScreenshot(item.id, pendingScreenshot);
+        screenshotCache.set(item.id, pendingScreenshot);
+    }
+
     document.getElementById('add-item-modal').style.display = 'none';
-    renderItems(collection.items, currentCollectionId);
+    await renderItems(collection.items, currentCollectionId);
 }
 
 /** @param {Item} item */
@@ -236,8 +254,10 @@ async function deleteItem(item) {
 
     collection.items = collection.items.filter(i => i.id !== item.id);
     await saveCollections(collections);
+    await deleteScreenshot(item.id);
+    screenshotCache.delete(item.id);
 
-    renderItems(collection.items, currentCollectionId);
+    await renderItems(collection.items, currentCollectionId);
 }
 
 /** @param {string} collectionId */
@@ -285,9 +305,9 @@ function getYoutubeThumbnail(url) {
 
 /** @param {(dataUrl: string) => void} callback */
 function captureScreenshot(callback) {
-    chrome.runtime.sendMessage({ action: 'captureNow' }, (response) => {
+    chrome.runtime.sendMessage({ action: 'captureNow' }, async (response) => {
         if (response?.dataUrl) {
-            callback(response.dataUrl);
+            callback(await compressImage(response.dataUrl));
         } else {
             console.error('Screenshot not available:', response?.error);
         }
@@ -295,11 +315,32 @@ function captureScreenshot(callback) {
 }
 
 /**
+ * @param {string} dataUrl
+ * @returns {Promise<string>}
+ */
+function compressImage(dataUrl) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const maxWidth = 480;
+            const scale = Math.min(1, maxWidth / img.width);
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.65));
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+    });
+}
+
+/**
  * @param {string} collectionId
  * @param {string} url
- * @param {string} dataUrl
+ * @param {string|null} screenshotDataUrl
  */
-async function saveItem(collectionId, url, dataUrl) {
+async function saveItem(collectionId, url, screenshotDataUrl) {
     const title = document.getElementById('input-title').value.trim();
     const note = document.getElementById('input-note').value.trim();
 
@@ -307,13 +348,13 @@ async function saveItem(collectionId, url, dataUrl) {
     const collection = findCollectionById(collections, collectionId);
     if (!collection) return;
 
+    const id = crypto.randomUUID();
     /** @type {Item} */
     const item = {
-        id: crypto.randomUUID(),
+        id,
         title,
         url,
         note,
-        screenshot: dataUrl,
         order: collection.items.length,
         addedAt: new Date().toISOString()
     };
@@ -321,6 +362,11 @@ async function saveItem(collectionId, url, dataUrl) {
     collection.items.push(item);
     await saveCollections(collections);
 
+    if (screenshotDataUrl) {
+        await saveScreenshot(id, screenshotDataUrl);
+        screenshotCache.set(id, screenshotDataUrl);
+    }
+
     document.getElementById('add-item-modal').style.display = 'none';
-    renderItems(collection.items, collectionId);
+    await renderItems(collection.items, collectionId);
 }
